@@ -39,7 +39,7 @@ Trong file `Connection.cs`, sửa chuỗi kết nối dán connection string:
 private string connectionString = @"Server=YOUR_SERVER;Database=QuanLyQuanCafe;Trusted_Connection=True;";
 ```
 **💡 Thông tin đăng nhập (mặc định)**  
-Dữ liệu này được lưu trong **database `QuanLyQuanCafe`**, bảng `TaiKhoan`.  
+Dữ liệu này được lưu trong **database `QuanLyQuanCafe`**, bảng `Users`.  
 
  - **Admin:**  
 >   - Username: `admin`  
