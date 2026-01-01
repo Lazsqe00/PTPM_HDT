@@ -23,7 +23,7 @@
 2. Mở **SQL Server Management Studio (SSMS)**.
 3. Chạy file SQL để tạo database và các bảng.
 
-## Chuỗi kết nối
+### Chuỗi kết nối
 
 Để phần mềm kết nối với database, bạn cần **Connection String**.  
 
