@@ -47,7 +47,7 @@ Dữ liệu này được lưu trong **database `QuanLyQuanCafe`**, bảng `TaiK
  - **Nhân viên thu ngân:**  
 >   - Username: `thungan`  
 >   - Password: `123`
- - **Nhân viên tiepnhan:**  
+ - **Nhân viên tiếp nhận đơn:**  
 >   - Username: `tiepnhan`  
 >   - Password: `123`
 
