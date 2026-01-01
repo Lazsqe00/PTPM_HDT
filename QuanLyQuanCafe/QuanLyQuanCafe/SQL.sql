@@ -104,7 +104,7 @@ GO
 
 
 INSERT INTO Users (maNV, tenNV, gioiTinh, ngaySinh, soDienThoai, email, diaChi, luongCoBan, role, username, password) VALUES
-('admin', N'Nguyễn Văn Admin', N'Nam', '1990-05-15', '0900000000', 'admin@cafe.com', N'TP.HCM', 20000000, 0, 'admin', 'admin'),
+('admin', N'Quản trị viên', N'Nam', '1990-05-15', '0900000000', 'admin@cafe.com', N'TP.HCM', 20000000, 0, 'admin', '123'),
 
 ('TNN001', N'Trần Thị Mai', N'Nữ', '1998-03-20', '0911111001', 'mai.tnn@cafe.com', N'Quận 1, HCM', 9000000, 1, 'tiepnhan', '123'),
 ('TNN002', N'Lê Văn Hùng', N'Nam', '1997-07-10', '0911111002', 'hung.tnn@cafe.com', N'Quận 3, HCM', 9000000, 1, 'tiepnhan2', '123'),
