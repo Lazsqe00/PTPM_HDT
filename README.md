@@ -39,3 +39,19 @@ Trong file `Connection.cs`, sửa chuỗi kết nối:
 
 ```csharp
 private string connectionString = @"Server=YOUR_SERVER;Database=QuanLyQuanCafe;Trusted_Connection=True;";
+```
+**💡 Thông tin đăng nhập (mặc định)**  
+Dữ liệu này được lưu trong **database `QuanLyQuanCafe`**, bảng `Users`.  
+
+ - **Admin:**  
+>   - Username: `admin`  
+>   - Password: `123`  
+ - **Nhân viên thu ngân:**  
+>   - Username: `thungan`  
+>   - Password: `123`
+ - **Nhân viên tiếp nhận đơn:**  
+>   - Username: `tiepnhan`  
+>   - Password: `123`
+
+> [!NOTE]
+Đây chỉ là bài tập nhỏ của môn học mô phỏng một số tính năng không phải dự án đầy đủ của hệ thống 
