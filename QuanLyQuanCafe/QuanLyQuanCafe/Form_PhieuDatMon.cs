@@ -157,12 +157,25 @@ namespace QuanLyQuanCafe
             if (modify.LuuPhieu(phieu, dsChiTiet))
             {
                 MessageBox.Show("Lưu phiếu đặt món thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
+                reset();
             }
             else
             {
                 MessageBox.Show("Lưu phiếu thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void reset()
+        {
+            txtTenKH.Clear();
+            txtSDT.Clear();
+            txtGhiChu.Clear();
+            danhSachChiTiet.Clear();
+            CapNhatDataGridView();
+            CapNhatTongTien();
+            SinhMaPhieu();
+            numSoLuong.Value = 1;
+            txtTenKH.Focus();
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
