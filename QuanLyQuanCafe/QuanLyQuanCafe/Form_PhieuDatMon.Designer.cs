@@ -138,9 +138,9 @@ namespace QuanLyQuanCafe
             // 
             lblDonGiaHienTai.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             lblDonGiaHienTai.ForeColor = Color.Red;
-            lblDonGiaHienTai.Location = new Point(324, 349);
+            lblDonGiaHienTai.Location = new Point(324, 359);
             lblDonGiaHienTai.Name = "lblDonGiaHienTai";
-            lblDonGiaHienTai.Size = new Size(205, 30);
+            lblDonGiaHienTai.Size = new Size(107, 30);
             lblDonGiaHienTai.TabIndex = 9;
             lblDonGiaHienTai.Text = "0 đ";
             lblDonGiaHienTai.TextAlign = ContentAlignment.MiddleRight;
@@ -234,7 +234,7 @@ namespace QuanLyQuanCafe
             // 
             btnXoaMon.Location = new Point(841, 644);
             btnXoaMon.Name = "btnXoaMon";
-            btnXoaMon.Size = new Size(121, 43);
+            btnXoaMon.Size = new Size(133, 43);
             btnXoaMon.TabIndex = 6;
             btnXoaMon.Text = "Xóa món";
             btnXoaMon.Click += btnXoaMon_Click;
