@@ -1,7 +1,8 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using QuanLyQuanCafe.Models;
-using System.Collections.Generic;
 
 namespace QuanLyQuanCafe
 {
@@ -9,15 +10,19 @@ namespace QuanLyQuanCafe
     {
         private string maNhanVien;
         private Modify modify = new Modify();
+        private List<ChiTietPhieuTemp> danhSachChiTiet = new List<ChiTietPhieuTemp>();
 
         public Form_PhieuDatMon(string maNV)
         {
             InitializeComponent();
             maNhanVien = maNV;
+        }
+
+        private void Form_PhieuDatMon_Load(object sender, EventArgs e)
+        {
             SinhMaPhieu();
             LoadMenu();
-            numSoLuong.ValueChanged += TinhThanhTien;
-            numDonGia.ValueChanged += TinhThanhTien;
+            CapNhatTongTien();
         }
 
         private void SinhMaPhieu()
@@ -35,47 +40,88 @@ namespace QuanLyQuanCafe
             cbTenMon.ValueMember = "MaMon";
 
             if (ds.Count > 0)
-                numDonGia.Value = (decimal)ds[0].Gia;
-        }
-
-        private void TinhThanhTien(object sender, EventArgs e)
-        {
-            decimal soLuong = numSoLuong.Value;
-            decimal donGia = numDonGia.Value;
-            decimal thanhTien = soLuong * donGia;
-            txtThanhTien.Text = thanhTien.ToString("#,##0") + " đ";
+            {
+                lblDonGiaHienTai.Text = ds[0].Gia.ToString("#,##0") + " đ";
+            }
         }
 
         private void cbTenMon_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbTenMon.SelectedItem is Menu mon)
-                numDonGia.Value = (decimal)mon.Gia;
+            {
+                lblDonGiaHienTai.Text = mon.Gia.ToString("#,##0") + " đ";
+            }
+        }
 
-            TinhThanhTien(null, null);
+        private void btnThemMon_Click(object sender, EventArgs e)
+        {
+            if (cbTenMon.SelectedIndex == -1) return;
+
+            Menu mon = cbTenMon.SelectedItem as Menu;
+            int soLuong = (int)numSoLuong.Value;
+
+            var existing = danhSachChiTiet.FirstOrDefault(x => x.MaMon == mon.MaMon);
+            if (existing != null)
+            {
+                existing.SoLuong += soLuong;
+                existing.ThanhTien = existing.SoLuong * existing.DonGia;
+            }
+            else
+            {
+                danhSachChiTiet.Add(new ChiTietPhieuTemp
+                {
+                    MaMon = mon.MaMon,
+                    TenMon = mon.TenMon,
+                    SoLuong = soLuong,
+                    DonGia = (float)mon.Gia,
+                    ThanhTien = soLuong * (float)mon.Gia
+                });
+            }
+
+            CapNhatDataGridView();
+            CapNhatTongTien();
+            numSoLuong.Value = 1;
+        }
+
+        private void CapNhatDataGridView()
+        {
+            dgvChiTiet.Rows.Clear();
+            foreach (var ct in danhSachChiTiet)
+            {
+                dgvChiTiet.Rows.Add(ct.TenMon, ct.SoLuong, ct.DonGia.ToString("#,##0"), ct.ThanhTien.ToString("#,##0"));
+            }
+        }
+
+        private void CapNhatTongTien()
+        {
+            float tong = danhSachChiTiet.Sum(x => x.ThanhTien);
+            txtThanhTien.Text = tong.ToString("#,##0") + " đ";
+        }
+
+        private void btnXoaMon_Click(object sender, EventArgs e)
+        {
+            if (dgvChiTiet.CurrentRow != null && dgvChiTiet.CurrentRow.Index >= 0)
+            {
+                int index = dgvChiTiet.CurrentRow.Index;
+                danhSachChiTiet.RemoveAt(index);
+                CapNhatDataGridView();
+                CapNhatTongTien();
+            }
         }
 
         private bool KiemTraToanSo(string chuoi)
         {
-            if (string.IsNullOrWhiteSpace(chuoi))
-                return false;
-
-            foreach (char c in chuoi)
-            {
-                if (!char.IsDigit(c))
-                    return false;
-            }
-
-            return true;
+            return !string.IsNullOrWhiteSpace(chuoi) && chuoi.All(char.IsDigit);
         }
+
         private void btnLuuPhieu_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtTenKH.Text) ||
-                string.IsNullOrWhiteSpace(txtSDT.Text) ||
-                cbTenMon.SelectedIndex == -1)
+            if (string.IsNullOrWhiteSpace(txtTenKH.Text) || string.IsNullOrWhiteSpace(txtSDT.Text))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng nhập tên và số điện thoại khách hàng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
             string sdt = txtSDT.Text.Trim();
             if (sdt.Length != 10 || !KiemTraToanSo(sdt))
             {
@@ -83,31 +129,39 @@ namespace QuanLyQuanCafe
                 return;
             }
 
+            if (danhSachChiTiet.Count == 0)
+            {
+                MessageBox.Show("Vui lòng thêm ít nhất một món vào phiếu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            float tongTien = danhSachChiTiet.Sum(x => x.ThanhTien);
+
             PhieuDatMon phieu = new PhieuDatMon(
                 txtMaPhieu.Text,
                 dtNgayDat.Value,
-                (float)(numSoLuong.Value * numDonGia.Value),
+                tongTien,
                 txtTrangThai.Text,
                 maNhanVien
             );
 
-            ChiTietPhieu ct = new ChiTietPhieu(
+            List<ChiTietPhieu> dsChiTiet = danhSachChiTiet.Select(ct => new ChiTietPhieu(
                 txtMaPhieu.Text,
-                (cbTenMon.SelectedItem as Menu).MaMon,
-                (int)numSoLuong.Value,
-                (float)numDonGia.Value,
-                (float)(numSoLuong.Value * numDonGia.Value),
+                ct.MaMon,
+                ct.SoLuong,
+                ct.DonGia,
+                ct.ThanhTien,
                 txtGhiChu.Text
-            );
+            )).ToList();
 
-            if (modify.LuuPhieu(phieu, ct))
+            if (modify.LuuPhieu(phieu, dsChiTiet))
             {
                 MessageBox.Show("Lưu phiếu đặt món thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                SinhMaPhieu();
-                numSoLuong.Value = 1;
-                txtGhiChu.Clear();
-                txtTenKH.Clear();
-                txtSDT.Clear();
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Lưu phiếu thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -115,6 +169,14 @@ namespace QuanLyQuanCafe
         {
             this.Close();
         }
+    }
 
+    internal class ChiTietPhieuTemp
+    {
+        public string MaMon { get; set; }
+        public string TenMon { get; set; }
+        public int SoLuong { get; set; }
+        public float DonGia { get; set; }
+        public float ThanhTien { get; set; }
     }
 }
