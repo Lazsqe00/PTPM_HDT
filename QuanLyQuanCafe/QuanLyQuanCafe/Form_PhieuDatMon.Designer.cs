@@ -138,7 +138,7 @@ namespace QuanLyQuanCafe
             // 
             lblDonGiaHienTai.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             lblDonGiaHienTai.ForeColor = Color.Red;
-            lblDonGiaHienTai.Location = new Point(324, 359);
+            lblDonGiaHienTai.Location = new Point(310, 352);
             lblDonGiaHienTai.Name = "lblDonGiaHienTai";
             lblDonGiaHienTai.Size = new Size(107, 30);
             lblDonGiaHienTai.TabIndex = 9;
