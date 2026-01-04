@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using QuanLyQuanCafe.Models;
 using System;
 using System.Collections.Generic;
@@ -181,16 +181,25 @@ namespace QuanLyQuanCafe
             return tenNV;
         }
 
-        public bool LuuPhieu(PhieuDatMon phieu, ChiTietPhieu ct)
+        // public bool LuuPhieu(PhieuDatMon phieu, ChiTietPhieu ct)
+        // { ... }
+
+
+        public bool LuuPhieu(PhieuDatMon phieu, List<ChiTietPhieu> dsChiTiet)
         {
             string queryPhieu = "INSERT INTO PhieuDatMon VALUES (@maPhieu, @ngayDat, @tongTien, @trangThai, @maNV)";
             string queryCT = "INSERT INTO ChiTietPhieu VALUES (@maPhieu, @maMon, @soLuong, @donGia, @thanhTien, @ghiChu)";
+
             using (SqlConnection conn = Connection.GetSqlConnection())
             {
+                SqlTransaction transaction = null;
                 try
                 {
                     conn.Open();
-                    using (SqlCommand cmd = new SqlCommand(queryPhieu, conn))
+                    transaction = conn.BeginTransaction(); 
+
+ 
+                    using (SqlCommand cmd = new SqlCommand(queryPhieu, conn, transaction))
                     {
                         cmd.Parameters.AddWithValue("@maPhieu", phieu.MaPhieu);
                         cmd.Parameters.AddWithValue("@ngayDat", phieu.NgayDat);
@@ -199,21 +208,32 @@ namespace QuanLyQuanCafe
                         cmd.Parameters.AddWithValue("@maNV", phieu.MaNhanVien);
                         cmd.ExecuteNonQuery();
                     }
-                    using (SqlCommand cmd = new SqlCommand(queryCT, conn))
+
+          
+                    using (SqlCommand cmd = new SqlCommand(queryCT, conn, transaction))
                     {
-                        cmd.Parameters.AddWithValue("@maPhieu", ct.MaPhieu);
-                        cmd.Parameters.AddWithValue("@maMon", ct.MaMon);
-                        cmd.Parameters.AddWithValue("@soLuong", ct.SoLuong);
-                        cmd.Parameters.AddWithValue("@donGia", ct.DonGia);
-                        cmd.Parameters.AddWithValue("@thanhTien", ct.ThanhTien);
-                        cmd.Parameters.AddWithValue("@ghiChu", ct.GhiChu ?? (object)DBNull.Value);
-                        cmd.ExecuteNonQuery();
+                        foreach (var ct in dsChiTiet)
+                        {
+                            cmd.Parameters.Clear(); 
+
+                            cmd.Parameters.AddWithValue("@maPhieu", ct.MaPhieu);
+                            cmd.Parameters.AddWithValue("@maMon", ct.MaMon);
+                            cmd.Parameters.AddWithValue("@soLuong", ct.SoLuong);
+                            cmd.Parameters.AddWithValue("@donGia", ct.DonGia);
+                            cmd.Parameters.AddWithValue("@thanhTien", ct.ThanhTien);
+                            cmd.Parameters.AddWithValue("@ghiChu", ct.GhiChu ?? (object)DBNull.Value);
+
+                            cmd.ExecuteNonQuery();
+                        }
                     }
+
+                    transaction.Commit(); 
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Lỗi SQL khi lưu phiếu: " + ex.Message);
+                    transaction?.Rollback(); 
+                    MessageBox.Show("Lỗi khi lưu phiếu đặt món: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
